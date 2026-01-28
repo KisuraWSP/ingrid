@@ -98,70 +98,56 @@ module.exports.getAllUsersController = async (req, res, next) => {
 
 module.exports.getUserByIdController = async (req, res, next) => {
   try {
-    const { labAssistantId } = req.params;
+    const { id } = req.params
+    const userItem = await user.findById(id)
 
-    const labAssistant = await LabAssistant.findById(labAssistantId);
-
-    if (!labAssistant) {
-      return res.status(404).json({ message: 'Lab Assistant not found' });
+    if (!userItem) {
+      return res.status(404).json({ message: 'User Not Found' })
     }
 
-    res.status(200).json({ labAssistant });
-  } catch (error) {
-    next(error);
+    const userResponse = userItem.toObject()
+    delete userResponse.password
+
+    res.status(200).json({ user: userResponse })
+  } catch(error) {
+    next(error)
   }
-};
+}
 
 module.exports.updateUserByIdController = async (req, res, next) => {
   try {
-    const { labAssistantId } = req.params;
+    const { id } = req.params
 
-    const {
-      lab_assistant_id,
-      firstName,
-      lastName,
-      gender,
-      phoneNumber,
-      emailAddress,
-      NIC,
-    } = req.body;
+    const { name, user_name, role } = req.body
 
-    const updatedLabAssistant = await LabAssistant.findByIdAndUpdate(
-      labAssistantId,
-      {
-        lab_assistant_id,
-        firstName,
-        lastName,
-        gender,
-        phoneNumber,
-        emailAddress,
-        NIC,
-      },
-      { new: true }
-    );
+    const updatedUser = await user.findByIdAndUpdate(
+      id,
+      { name, user_name, role },
+      { new : true } 
+    )
 
-    if (!updatedLabAssistant) {
-      return res.status(404).json({ message: 'Lab Assistant not found' });
+    if (!updatedUser) {
+      return res.status(404).json({ message : 'User Not Found' })
     }
 
-    res.status(200).json({ message: 'Lab Assistant updated successfully', labAssistant: updatedLabAssistant });
-  } catch (error) {
-    next(error);
+    res.status(200).json({ message: 'Updated User Successfully' ,user : updatedUser})
+  } catch(error) {
+    next(error)
   }
-};
+}
 
 module.exports.deleteUserByIdController = async (req, res, next) => {
   try {
-    const { labAssistantId } = req.params;
+    const { id } = req.params
 
-    const deletedLabAssistant = await LabAssistant.findByIdAndDelete(labAssistantId);
+    const deletedUser = await user.findByIdAndDelete(id)
 
-    if (!deletedLabAssistant) {
-      return res.status(404).json({ message: 'Lab Assistant not found' });
+    if (!deletedUser) {
+      return res.status(404).json({ message: 'User Not Found' })
     }
 
-    res.status(200).json({ message: 'Lab Assistant deleted successfully' });
-  } catch (error) {
-    next(error);
+    res.status(200).json({message : 'User Deleted Successfully' })
+  } catch(error) {
+    next(error)
   }
-};
+}
